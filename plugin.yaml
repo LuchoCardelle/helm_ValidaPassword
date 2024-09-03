@@ -3,4 +3,4 @@ version: "0.1.0"
 usage: |
   helm ValidaPassword [solo path del archivo values.yaml]
 description: "valida string de contraseñas en caso de existencia en el archivo values.yaml"
-command: "WhiteStack/Plugin/ValidaPassword.sh"
+command: "WhiteStack/Plugin/ValidaPassword/ValidaPassword.sh"
