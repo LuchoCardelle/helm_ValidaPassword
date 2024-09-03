@@ -2,5 +2,5 @@ name: "ValidaPassword"
 version: "0.1.0"
 usage: |
   helm ValidaPassword [solo path del archivo values.yaml]
-description: "A Helm plugin that validates sensitive parameters in values.yaml and migrates them to Kubernetes secrets."
-command: "/root/helmcharts/WhiteStack/plugin/ValidaPassword/ValidaPassword.sh"
+description: "valida string de contraseñas en caso de existencia en el archivo values.yaml"
+command: "WhiteStack/Plugin/ValidaPassword.sh"
