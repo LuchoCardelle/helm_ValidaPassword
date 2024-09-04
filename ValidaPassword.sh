@@ -25,7 +25,7 @@ fi
 
 # Comprobar si se ha pasado el argumento --version
 if [[ "$1" == "--version" ]]; then
-  echo "SecretValidator versión 0.1.0"
+  echo "ValidaPassword versión 0.1.0"
   echo
   exit 0
 fi
@@ -35,7 +35,7 @@ fi
 
 # Verifica que se haya proporcionado un archivo de Helm Chart
 if [ "$#" -ne 1 ]; then
-    echo "Usage: resource-summary <chart-path>"
+    echo "Usage: ValidaPassword <chart-path>"
     exit 1
 fi
 
