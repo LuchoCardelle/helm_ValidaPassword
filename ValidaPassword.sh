@@ -45,7 +45,9 @@ CHART_PATH=$1
 PASSWORD_REGEX='^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$'
 
 # Obtener el archivo values.yaml del chart
-VALUES_FILE="$1/values.yaml"
+VALUES_FILE() {
+	helm show values ws/ch5 | yq | grep -oP '^[^:]+:.*' | grep -Eo '.*:(.*)'
+}
 
 # Función para validar contraseñas
 validate_passwords() {
@@ -53,7 +55,7 @@ validate_passwords() {
   local invalid=false
 
   # Buscar claves que contengan passwords, pwd, pass, o credentials
-  grep -oP '^[^:]+:.*' "$values_file" | grep -Eo '.*:(.*)' | while IFS= read -r line; do
+  VALUES_FILE | while IFS= read -r line; do
     key=$(echo "$line" | awk -F':' '{print $1}' | xargs)
     value=$(echo "$line" | awk -F':' '{print $2}' | xargs)
 
@@ -61,6 +63,7 @@ validate_passwords() {
       if [[ ! $value =~ $PASSWORD_REGEX ]]; then
         echo "Error: El valor para $key no cumple con los requisitos de seguridad."
         invalid=true
+	exit 1
       fi
     fi
   done
@@ -73,6 +76,5 @@ validate_passwords() {
 # Validar el archivo values.yaml
 validate_passwords "$VALUES_FILE"
 
-echo "Validación completada con éxito."
 
 # (Opcional) Aquí se puede agregar lógica para migrar configuraciones a secrets
