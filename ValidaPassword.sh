@@ -41,8 +41,34 @@ fi
 
 CHART_PATH=$1
 
-# Define la expresión regular para validar passwords
-PASSWORD_REGEX='^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$'
+validate() {
+  min_length=8
+  if [[ $(echo $COUNT) -lt $min_length ]]; then
+    echo "a. Longitud mínima del password: 8 caracteres. [chequear] $KEY"
+    exit 1
+  fi
+
+  if ! [[ $VALUE =~ [A-Z] ]]; then
+    echo "b. Al menos una letra en mayúscula. [chequear] $KEY"
+    exit 1
+  fi
+
+  if ! [[ $VALUE =~ [a-z] ]]; then
+    echo "c. Al menos una letra en minúscula. [chequear] $KEY"
+    exit 1
+  fi
+
+  if ! [[ $VALUE =~ [0-9] ]]; then
+    echo "d. Al menos un dígito. [chequear] $KEY"
+    exit 1
+  fi
+
+  if ! [[ $VALUE =~ [\@\#\$\%\^\&\*\(\)\_\+\-\=\{\}\[\]\|\:\;\"\'\<\>\,\.\?\/] ]]; then
+    echo "e. Al menos un caracter especial. [chequear] $KEY"
+    echo "opcoines : [\@\#\$\%\^\&\*\(\)\_\+\-\=\{\}\[\]\|\:\;\"\'\<\>\,\.\?\/]"
+    exit 1
+  fi
+}
 
 # Obtener el archivo values.yaml del chart
 VALUES_FILE() {
@@ -56,15 +82,15 @@ validate_passwords() {
 
   # Buscar claves que contengan passwords, pwd, pass, o credentials
   VALUES_FILE | while IFS= read -r line; do
-    key=$(echo "$line" | awk -F':' '{print $1}' | xargs)
-    value=$(echo "$line" | awk -F':' '{print $2}' | xargs)
+    KEY=$(echo "$line" | awk -F':' '{print $1}' | xargs)
+    VALUE=$(echo "$line" | awk -F':' '{print $2}' | xargs)
+    COUNT=$(echo $VALUE | sed 's/ //g' | wc -m)
 
-    if [[ $key =~ passwords|pwd|pass|credentials ]]; then
-      if [[ ! $value =~ $PASSWORD_REGEX ]]; then
+    if [[ $KEY =~ passwords|pwd|pass|credentials ]]; then
+	validate
         echo "Error: El valor para $key no cumple con los requisitos de seguridad."
         invalid=true
 	exit 1
-      fi
     fi
   done
 
@@ -75,6 +101,3 @@ validate_passwords() {
 
 # Validar el archivo values.yaml
 validate_passwords "$VALUES_FILE"
-
-
-# (Opcional) Aquí se puede agregar lógica para migrar configuraciones a secrets
